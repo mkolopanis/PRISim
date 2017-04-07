@@ -4766,7 +4766,7 @@ class InterferometerArray(object):
     def observe(self, timestamp, Tsysinfo, bandpass, pointing_center, skymodel,
                 t_acc, pb_info=None, brightness_units=None, bpcorrect=None,
                 roi_info=None, roi_radius=None, roi_center=None, lst=None,
-                gradient_mode=None, memsave=False):
+                gradient_mode=None, memsave=False, memuse=None):
 
         """
         -------------------------------------------------------------------------
@@ -4865,6 +4865,10 @@ class InterferometerArray(object):
 
         memsave      [boolean] If set to True, enforce computations in single
                      precision, otherwise enforce double precision (default)
+
+        memuse       [float] If set, limits memory available for an observation
+                     before accumulating visibilities. If None, attempts to
+                     simulate all visibilites simultaneously.
         ------------------------------------------------------------------------
         """
 
@@ -5136,9 +5140,11 @@ class InterferometerArray(object):
                     vis_wts = vis_wts.astype(NP.float32, copy=False)
             else:
                 self.geometric_delays = self.geometric_delays + [geometric_delays]
-
-            # memory_available = psutil.phymem_usage().available
-            memory_available = psutil.virtual_memory().available
+            if memuse is None:
+                # memory_available = psutil.phymem_usage().available
+                memory_available = psutil.virtual_memory().available
+            else:
+                memory_available = memuse
 
             if gradient_mode is None:
                 if memsave:
@@ -7650,11 +7656,25 @@ class InterferometerData(object):
                 ant_hdu.header['EXTVER'] = 1
 
                 # write XYZ coordinates if not already defined
-                ant_hdu.header['ARRAYX'] = self.infodict['telescope_location'][0]
-                ant_hdu.header['ARRAYY'] = self.infodict['telescope_location'][1]
-                ant_hdu.header['ARRAYZ'] = self.infodict['telescope_location'][2]
-                # ant_hdu.header['FRAME'] = 'ITRF'
-                ant_hdu.header['FRAME'] = None
+                # use the pyuvdata module to calculate correct XYZ coordinates
+                # if pyuvdata module not found, set frame as 'None'
+                # this allows pyuvdata to read the output files
+                # however the telescope location will still be wrong.
+                if uvdata_module_found:
+                    from pyuvdata import utils
+                    loc_array = self.infodict['telescope_location']
+                    # convert location in lat lon alt degrees to radains
+                    loc_array *= NP.pi/180.
+                    # convert location in radians to XYZ in ITRF
+                    XYZ = utils.XYZ_from_LatLonAlt(*loc_array)
+                else:
+                    XYZ = self.infodict['telescope_location']
+                ant_hdu.header['ARRAYX'] = XYZ[0]                ant_hdu.header['ARRAYY'] = XYZ[1]
+                ant_hdu.header['ARRAYZ'] = XYZ[2]
+                if uvdata_module_found:
+                    ant_hdu.header['FRAME'] = 'ITRF'
+                else:
+                    ant_hdu.header['FRAME'] = None
                 ant_hdu.header['GSTIA0'] = self.infodict['gst0']
                 ant_hdu.header['FREQ'] = self.infodict['freq_array'][0, 0]
                 ant_hdu.header['RDATE'] = self.infodict['rdate']

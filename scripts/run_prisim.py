@@ -18,15 +18,15 @@ import matplotlib.colors as PLTC
 import matplotlib.animation as MOV
 from scipy.interpolate import griddata
 import datetime as DT
-import time 
+import time
 import progressbar as PGB
 import healpy as HP
-import psutil 
+import psutil
 from astroutils import MPI_modules as my_MPI
 from astroutils import geometry as GEOM
 from astroutils import catalog as SM
 from astroutils import constants as CNST
-from astroutils import DSP_modules as DSP 
+from astroutils import DSP_modules as DSP
 from astroutils import lookup_operations as LKP
 from astroutils import mathops as OPS
 import prisim
@@ -91,7 +91,7 @@ else:
                             else:
                                 raise KeyError('Invalid parameter found in custom simulation parameters file')
                 else:
-                    raise KeyError('Invalid parameter found in custom simulation parameters file')                            
+                    raise KeyError('Invalid parameter found in custom simulation parameters file')
 
 rootdir = parms['dirstruct']['rootdir']
 project = parms['dirstruct']['project']
@@ -495,7 +495,7 @@ if antenna_file is not None:
         raise TypeError('Filename containing antenna array elements must be a string')
     if parms['array']['filepathtype'] == 'default':
         antenna_file = prisim_path+'data/array_layouts/'+antenna_file
-    
+
     antfile_parser = parms['array']['parser']
     if 'comment' in antfile_parser:
         comment = antfile_parser['comment']
@@ -753,9 +753,9 @@ if pointing_file is not None:
             t_acc = 112.0 + NP.zeros(n_acc)   # in seconds (needs to be generalized)
             # lst = lst_wrapped[pick_snapshots] + 0.5 * t_acc/3.6e3 * 15.0
             lst = lst_wrapped[pick_snapshots] + 0.5 * t_acc/3.6e3 * 15.0 / sday
-            
+
     if pick_snapshots is None:
-        if obs_mode != 'lstbin':        
+        if obs_mode != 'lstbin':
             if not beam_switch:
                 lst = 0.5*(lst_edges[1:]+lst_edges[:-1])
                 # t_acc = (lst_edges[1:]-lst_edges[:-1]) / 15.0 * 3.6e3
@@ -805,7 +805,7 @@ elif (pointing_drift_init is not None) or (pointing_track_init is not None):
         lst_init = pointing_drift_init['lst']
         lst_init *= 15.0 # initial LST is now in degrees
         lstobj._epoch = obs_date
-       
+
         if (alt is None) or (az is None):
             if (ha is None) or (dec is None):
                 raise ValueError('One of alt-az or ha-dec pairs must be specified')
@@ -814,7 +814,7 @@ elif (pointing_drift_init is not None) or (pointing_track_init is not None):
             altaz_init = NP.asarray([alt, az])
             hadec_init = GEOM.altaz2hadec(altaz_init.reshape(1,-1), latitude, units='degrees')
         pointings_hadec = NP.repeat(hadec_init.reshape(1,-1), n_acc, axis=0)
-            
+
     if obs_mode == 'track':
         ra = pointing_track_init['ra']
         dec = pointing_track_init['dec']
@@ -823,7 +823,7 @@ elif (pointing_drift_init is not None) or (pointing_track_init is not None):
         lst_init = ra + ha
         lstobj._epoch = epoch
         pointings_hadec = NP.hstack((ha + (t_acc/3.6e3)*15.0*NP.arange(n_acc).reshape(-1,1), dec+NP.zeros(n_acc).reshape(-1,1)))
-        
+
     lstobj._ra = NP.radians(lst_init)
 
     obsrvr = EP.Observer()
@@ -834,12 +834,12 @@ elif (pointing_drift_init is not None) or (pointing_track_init is not None):
     lstobj.compute(obsrvr)
     lst_init_fgcat_epoch = NP.degrees(lstobj.ra) / 15.0 # LST (hours) in epoch of foreground catalog
     # lst = (lst_init_fgcat_epoch + (t_acc/3.6e3) * NP.arange(n_acc)) * 15.0 # in degrees at the epoch of the foreground catalog
-    lst = (lst_init_fgcat_epoch + (t_acc/3.6e3) * NP.arange(n_acc)) * 15.0 / sday # in degrees at the epoch of the foreground catalog    
+    lst = (lst_init_fgcat_epoch + (t_acc/3.6e3) * NP.arange(n_acc)) * 15.0 / sday # in degrees at the epoch of the foreground catalog
     t_acc = t_acc + NP.zeros(n_acc)
     pointings_altaz = GEOM.hadec2altaz(pointings_hadec, latitude, units='degrees')
     pointings_dircos = GEOM.altaz2dircos(pointings_altaz, units='degrees')
     pointings_radec = NP.hstack(((lst-pointings_hadec[:,0]).reshape(-1,1), pointings_hadec[:,1].reshape(-1,1)))
-    
+
     pntgobj = EP.FixedBody()
     pntgobj._epoch = lstobj._epoch
     obsrvr.date = obs_date # Now compute transit times for date of observation
@@ -1039,7 +1039,7 @@ try:
     ids = bl_id.tolist()
 except NameError:
     ids = range(bl.shape[0])
-    
+
 if not isinstance(mpi_key, str):
     raise TypeError('MPI key must be a string')
 if mpi_key not in ['src', 'bl', 'freq']:
@@ -1065,7 +1065,7 @@ if mpi_eqvol:
 else:
     mpi_sync = False
     mpi_async = True
-    
+
 freq = NP.float(freq)
 freq_resolution = NP.float(freq_resolution)
 base_bpass = 1.0*NP.ones(nchan)
@@ -1098,7 +1098,7 @@ if pfb_method is not None:
         pfbwin_interp = NP.interp(chans, pfbfreq[useful_freq_range]/1e3, pfbwin[useful_freq_range])
         bandpass_shape = 10**(pfbwin_interp/10)
     if flag_repeat_edge_channels:
-        if NP.any(n_edge_flag > 0): 
+        if NP.any(n_edge_flag > 0):
             pfb_edge_channels = (bandpass_shape.argmin() + NP.arange(nchan/coarse_channel_width)*coarse_channel_width) % nchan
             # pfb_edge_channels = bandpass_shape.argsort()[:int(1.0*nchan/coarse_channel_width)]
             # wts = NP.exp(-0.5*((NP.arange(bandpass_shape.size)-0.5*bandpass_shape.size)/4.0)**2)/(4.0*NP.sqrt(2*NP.pi))
@@ -1119,7 +1119,7 @@ if ant_bpass_file is not None:
         ant_bpass_ref = ant_bpass_fileobj['band']
         ant_bpass_ref /= NP.abs(ant_bpass_ref).max()
         ant_bpass_freq = ant_bpass_freq[ant_bpass_freq.size/2:]
-        ant_bpass_ref = ant_bpass_ref[ant_bpass_ref.size/2:]        
+        ant_bpass_ref = ant_bpass_ref[ant_bpass_ref.size/2:]
         # ant_bpass_window = DSP.windowing(ant_bpass_freq.size, shape='bhw', pad_width=0, pad_value=0.0, peak=1.0, centering=True)
         # ant_bpass_freq = ant_bpass_freq[1:-1]
         # ant_bpass_ref = ant_bpass_ref[1:-1] / ant_bpass_window[1:-1]
@@ -1127,7 +1127,7 @@ if ant_bpass_file is not None:
 else:
     ant_bpass = NP.ones(nchan)
 
-window = nchan * DSP.windowing(nchan, shape=bpass_shape, pad_width=n_pad, centering=True, area_normalize=True) 
+window = nchan * DSP.windowing(nchan, shape=bpass_shape, pad_width=n_pad, centering=True, area_normalize=True)
 if bandpass_correct:
     bpcorr = 1/bandpass_shape
     bandpass_shape = NP.ones(base_bpass.size)
@@ -1166,7 +1166,7 @@ if use_HI_cube:
         raise TypeError('Parameter specifying use of Lidz simulations must be Boolean')
     if not isinstance(use_21cmfast, bool):
         raise TypeError('Parameter specifying use of 21cmfast simulations must be Boolean')
-    
+
 if use_HI_monopole or use_HI_fluctuations or use_HI_cube:
     if use_lidz and use_21cmfast:
         raise ValueError('Only one of Adam Lidz or 21CMFAST simulations can be chosen')
@@ -1452,7 +1452,7 @@ elif use_USM:
     catlabel = NP.repeat('USM', fluxes_USM.size)
     majax = NP.degrees(HP.nside2resol(nside)) * NP.ones(fluxes_USM.size)
     minax = NP.degrees(HP.nside2resol(nside)) * NP.ones(fluxes_USM.size)
-    hdulist.close()  
+    hdulist.close()
 
     flux_unit = 'Jy'
     spec_type = 'func'
@@ -1470,7 +1470,7 @@ elif use_USM:
 
     # skymod = SM.SkyModel(catlabel, chans*1e9, NP.hstack((ra_deg.reshape(-1,1), dec_deg.reshape(-1,1))), spec_type, spec_parms=spec_parms, src_shape=NP.hstack((majax.reshape(-1,1),minax.reshape(-1,1),NP.zeros(fluxes_USM.size).reshape(-1,1))), src_shape_units=['degree','degree','degree'])
     skymod = SM.SkyModel(init_parms=skymod_init_parms, init_file=None)
-  
+
 elif use_CSM:
     freq_SUMSS = 0.843 # in GHz
     catalog = NP.loadtxt(SUMSS_file, usecols=(0,1,2,3,4,5,10,12,13,14,15,16))
@@ -1548,7 +1548,7 @@ elif use_CSM:
 
     not_in_SUMSS_ind = dec_deg_NVSS > -30.0
     # not_in_SUMSS_ind = NP.logical_and(dec_deg_NVSS > -30.0, dec_deg_NVSS <= min(90.0, latitude+90.0))
-    
+
     if fluxcut_max is None:
         select_source_ind = nvss_fpeak >= fluxcut_min * (freq_NVSS*1e9/fluxcut_freq)**spindex_NVSS
     else:
@@ -1560,7 +1560,7 @@ elif use_CSM:
     count_valid = NP.sum(NP.logical_and(NP.logical_and(not_in_SUMSS_ind, select_source_ind), PS_ind))
     if count_valid > 0:
         nvss_fpeak = nvss_fpeak[NP.logical_and(NP.logical_and(not_in_SUMSS_ind, select_source_ind), PS_ind)]
-        if NP.sum(select_SUMSS_source_ind) > 0: 
+        if NP.sum(select_SUMSS_source_ind) > 0:
             freq_catalog = NP.concatenate((freq_catalog, freq_NVSS*1e9 + NP.zeros(count_valid)))
             catlabel = NP.concatenate((catlabel, NP.repeat('NVSS',count_valid)))
             ra_deg = NP.concatenate((ra_deg, ra_deg_NVSS[NP.logical_and(NP.logical_and(not_in_SUMSS_ind, select_source_ind), PS_ind)]))
@@ -1654,7 +1654,7 @@ elif use_SUMSS:
     majax = fmajax/3.6e3
     minax = fminax/3.6e3
     fluxes = fint + 0.0
-    
+
     # if spindex_seed is None:
     #     spindex = -0.83 + spindex_rms * NP.random.randn(fint.size)
     # else:
@@ -1766,7 +1766,7 @@ elif use_custom:
     pa = pa[select_source_ind]
     freq_catalog = freq_catalog[select_source_ind]
     catlabel = catlabel[select_source_ind]
-    
+
     spec_type = 'func'
     spec_parms = {}
     # spec_parms['name'] = NP.repeat('tanh', ra_deg.size)
@@ -1819,7 +1819,7 @@ if mpi_on_src:
     src_chunk = range(len(src_bin_indices))
     n_src_chunks = len(src_bin_indices)
 elif mpi_on_freq:
-    frequency_chunk_size = int(NP.floor(1.0 * nchan / n_chunks))
+    frequency_chunk_size = int(NP.floor(1.0 * nchan / nproc))
     frequency_bin_indices = range(0, nchan, frequency_chunk_size)
     if frequency_bin_indices[-1] == nchan-1:
         if frequency_chunk_size > 2:
@@ -1884,7 +1884,7 @@ except OSError as exception:
         pass
     else:
         raise
-    
+
 if cleanup < 3:
     try:
         os.makedirs(rootdir+project_dir+simid+skymod_dir, 0755)
@@ -1893,7 +1893,7 @@ if cleanup < 3:
             pass
         else:
             raise
-    
+
 ## Set up the observing run
 
 process_complete = False
@@ -1927,12 +1927,12 @@ if mpi_on_src: # MPI based on source multiplexing
             ts = time.time()
             if j == 0:
                 ts0 = ts
-            ia.observe(timestamp, Tsysinfo, bpass, pointings_hadec[j,:], skymod.subset(roi_ind[cumm_src_count[rank]:cumm_src_count[rank+1]].tolist()), t_acc[j], pb_info=pbinfo, brightness_units=flux_unit, bpcorrect=noise_bpcorr, roi_radius=None, roi_center=None, lst=lst[j], gradient_mode=gradient_mode, memsave=memsave)
+            ia.observe(timestamp, Tsysinfo, bpass, pointings_hadec[j,:], skymod.subset(roi_ind[cumm_src_count[rank]:cumm_src_count[rank+1]].tolist()), t_acc[j], pb_info=pbinfo, brightness_units=flux_unit, bpcorrect=noise_bpcorr, roi_radius=None, roi_center=None, lst=lst[j], gradient_mode=gradient_mode, memsave=memsave, memuse=memory_use_per_process)
             te = time.time()
             # print '{0:.1f} seconds for snapshot # {1:0d}'.format(te-ts, j)
             progress.update(j+1)
         progress.finish()
-    
+
         # svf = NP.zeros_like(ia.skyvis_freq.astype(NP.complex128), dtype='complex128')
         if rank == 0:
             for k in range(1,nproc):
@@ -1981,7 +1981,7 @@ elif mpi_on_freq: # MPI based on frequency multiplexing
                     else:
                         pbinfo['pointing_center'] = pointings_altaz[j,:]
                         pbinfo['pointing_coords'] = 'altaz'
-                        
+
                     if (telescope_id == 'mwa') or (phased_array):
                         # pbinfo['element_locs'] = element_locs
                         pbinfo['delayerr'] = phasedarray_delayerr
@@ -1998,7 +1998,7 @@ elif mpi_on_freq: # MPI based on frequency multiplexing
                     if beam_chromaticity:
                         interp_logbeam = OPS.healpix_interp_along_axis(NP.log10(external_beam), theta_phi=theta_phi, inloc_axis=external_beam_freqs, outloc_axis=chans*1e9, axis=1, kind=pbeam_spec_interp_method, assume_sorted=True)
                         # interp_logbeam = OPS.healpix_interp_along_axis(NP.log10(external_beam), theta_phi=theta_phi, inloc_axis=external_beam_freqs, outloc_axis=chans*1e9, axis=1, kind=pbeam_spec_interp_method, assume_sorted=True)
-                        
+
                     else:
                         nearest_freq_ind = NP.argmin(NP.abs(external_beam_freqs*1e6 - select_beam_freq))
                         interp_logbeam = OPS.healpix_interp_along_axis(NP.log10(NP.repeat(external_beam[:,nearest_freq_ind].reshape(-1,1), chans.size, axis=1)), theta_phi=theta_phi, inloc_axis=chans*1e9, outloc_axis=chans*1e9, axis=1, assume_sorted=True)
@@ -2017,7 +2017,7 @@ elif mpi_on_freq: # MPI based on frequency multiplexing
                 roiinfo['center_coords'] = 'radec'
 
                 roi.append_settings(skymod, chans, pinfo=pbinfo, lst=lst[j], roi_info=roiinfo, telescope=telescope, freq_scale='GHz')
-                
+
                 progress.update(j+1)
             progress.finish()
 
@@ -2034,7 +2034,7 @@ elif mpi_on_freq: # MPI based on frequency multiplexing
 
         for i in range(cumm_freq_chunks[rank], cumm_freq_chunks[rank+1]):
             print 'Process {0:0d} working on frequency chunk # {1:0d} ...'.format(rank, freq_chunk[i])
-    
+
             chans_chunk_indices = NP.arange(frequency_bin_indices[freq_chunk[i]], min(frequency_bin_indices[freq_chunk[i]]+frequency_chunk_size,nchan))
             chans_chunk = NP.asarray(chans[chans_chunk_indices]).reshape(-1)
             nchan_chunk = chans_chunk.size
@@ -2043,7 +2043,7 @@ elif mpi_on_freq: # MPI based on frequency multiplexing
             bw_chunk_str = '{0:0d}x{1:.1f}_kHz'.format(nchan_chunk, freq_resolution/1e3)
             outfile = rootdir+project_dir+simid+sim_dir+'_part_{0:0d}'.format(i)
             ia = RI.InterferometerArray(labels, bl, chans_chunk, telescope=telescope, latitude=latitude, longitude=longitude, altitude=altitude, A_eff=A_eff, layout=layout_info, freq_scale='GHz', pointing_coords='hadec', gaininfo=gaininfo)
-            
+
             progress = PGB.ProgressBar(widgets=[PGB.Percentage(), PGB.Bar(marker='-', left=' |', right='| '), PGB.Counter(), '/{0:0d} Snapshots '.format(n_acc), PGB.ETA()], maxval=n_acc).start()
             for j in range(n_acc):
                 roi_ind_snap = fits.getdata(roifile+'.fits', extname='IND_{0:0d}'.format(j), memmap=False)
@@ -2054,12 +2054,12 @@ elif mpi_on_freq: # MPI based on frequency multiplexing
                 else:
                     # timestamp = lst[j]
                     timestamp = timestamps[j]
-             
+
                 ts = time.time()
                 if j == 0:
                     ts0 = ts
-              
-                ia.observe(timestamp, Tsysinfo, bpass[chans_chunk_indices], pointings_hadec[j,:], skymod.subset(chans_chunk_indices, axis='spectrum'), t_acc[j], pb_info=pbinfo, brightness_units=flux_unit, bpcorrect=noise_bpcorr[chans_chunk_indices], roi_info={'ind': roi_ind_snap, 'pbeam': roi_pbeam_snap}, roi_radius=None, roi_center=None, lst=lst[j], gradient_mode=gradient_mode, memsave=memsave)
+
+                ia.observe(timestamp, Tsysinfo, bpass[chans_chunk_indices], pointings_hadec[j,:], skymod.subset(chans_chunk_indices, axis='spectrum'), t_acc[j], pb_info=pbinfo, brightness_units=flux_unit, bpcorrect=noise_bpcorr[chans_chunk_indices], roi_info={'ind': roi_ind_snap, 'pbeam': roi_pbeam_snap}, roi_radius=None, roi_center=None, lst=lst[j], gradient_mode=gradient_mode, memsave=memsave, memuse=memory_use_per_process)
                 te = time.time()
                 # print '{0:.1f} seconds for snapshot # {1:0d}'.format(te-ts, j)
                 del roi_ind_snap
@@ -2093,7 +2093,7 @@ else: # MPI based on baseline multiplexing
                 print 'Process {0:0d} working on baseline chunk # {1:0d} ...'.format(rank, count)
 
                 outfile = rootdir+project_dir+simid+sim_dir+'_part_{0:0d}'.format(count)
-                ia = RI.InterferometerArray(labels[baseline_bin_indices[count]:min(baseline_bin_indices[count]+baseline_chunk_size,total_baselines)], bl[baseline_bin_indices[count]:min(baseline_bin_indices[count]+baseline_chunk_size,total_baselines),:], chans, telescope=telescope, latitude=latitude, longitude=longitude, altitude=altitude, A_eff=A_eff, layout=layout_info, freq_scale='GHz', pointing_coords='hadec', gaininfo=gaininfo)        
+                ia = RI.InterferometerArray(labels[baseline_bin_indices[count]:min(baseline_bin_indices[count]+baseline_chunk_size,total_baselines)], bl[baseline_bin_indices[count]:min(baseline_bin_indices[count]+baseline_chunk_size,total_baselines),:], chans, telescope=telescope, latitude=latitude, longitude=longitude, altitude=altitude, A_eff=A_eff, layout=layout_info, freq_scale='GHz', pointing_coords='hadec', gaininfo=gaininfo)
 
                 progress = PGB.ProgressBar(widgets=[PGB.Percentage(), PGB.Bar(), PGB.ETA()], maxval=n_acc).start()
                 for j in range(n_acc):
@@ -2115,7 +2115,7 @@ else: # MPI based on baseline multiplexing
                     ts = time.time()
                     if j == 0:
                         ts0 = ts
-                    ia.observe(timestamp, Tsysinfo, bpass, pointings_hadec[j,:], skymod, t_acc[j], pb_info=pbinfo, brightness_units=flux_unit, bpcorrect=noise_bpcorr, roi_radius=None, roi_center=None, lst=lst[j], gradient_mode=gradient_mode, memsave=memsave)
+                    ia.observe(timestamp, Tsysinfo, bpass, pointings_hadec[j,:], skymod, t_acc[j], pb_info=pbinfo, brightness_units=flux_unit, bpcorrect=noise_bpcorr, roi_radius=None, roi_center=None, lst=lst[j], gradient_mode=gradient_mode, memsave=memsave, memuse=memory_use_per_process)
                     te = time.time()
                     # print '{0:.1f} seconds for snapshot # {1:0d}'.format(te-ts, j)
                     progress.update(j+1)
@@ -2157,7 +2157,7 @@ else: # MPI based on baseline multiplexing
                     roi_subset = NP.where(NP.logical_and(hemisphere_current, roi_ind))[0].tolist()
                     src_dircos_current_subset = GEOM.altaz2dircos(src_altaz_current[roi_subset,:], units='degrees')
                     fgmod = skymod.subset(roi_subset)
-   
+
                     pbinfo = {}
                     if (telescope_id == 'mwa') or (phased_array) or (telescope_id == 'mwa_tools'):
                         if pointing_file is not None:
@@ -2165,7 +2165,7 @@ else: # MPI based on baseline multiplexing
                         else:
                             pbinfo['pointing_center'] = pointings_altaz[j,:]
                             pbinfo['pointing_coords'] = 'altaz'
-                            
+
                         if (telescope_id == 'mwa') or (phased_array):
                             # pbinfo['element_locs'] = element_locs
                             pbinfo['delayerr'] = phasedarray_delayerr
@@ -2184,7 +2184,7 @@ else: # MPI based on baseline multiplexing
                         else:
                             nearest_freq_ind = NP.argmin(NP.abs(external_beam_freqs*1e6 - freq))
                             interp_logbeam = OPS.healpix_interp_along_axis(NP.log10(NP.repeat(external_beam[:,nearest_freq_ind].reshape(-1,1), chans.size, axis=1)), theta_phi=theta_phi, inloc_axis=chans*1e9, outloc_axis=chans*1e9, axis=1, kind=pbeam_spec_interp_method, assume_sorted=True)
-                        
+
                         interp_logbeam_max = NP.nanmax(interp_logbeam, axis=0)
                         interp_logbeam_max[interp_logbeam_max <= 0.0] = 0.0
                         interp_logbeam_max = interp_logbeam_max.reshape(1,-1)
@@ -2200,7 +2200,7 @@ else: # MPI based on baseline multiplexing
                     roiinfo['center_coords'] = 'radec'
 
                     roi.append_settings(skymod, chans, pinfo=pbinfo, lst=lst[j], roi_info=roiinfo, telescope=telescope, freq_scale='GHz')
-                    
+
                     progress.update(j+1)
                 progress.finish()
 
@@ -2237,7 +2237,7 @@ else: # MPI based on baseline multiplexing
 
                         cbax1 = fig.add_axes([0.88, 0.1, 0.02, 0.35])
                         cbar1 = fig.colorbar(pbsky, cax=cbax1, orientation='vertical')
-                        
+
                         fig.subplots_adjust(hspace=0)
                         big_ax = fig.add_subplot(111)
                         big_ax.set_axis_bgcolor('none')
@@ -2251,10 +2251,10 @@ else: # MPI based on baseline multiplexing
 
             for i in range(cumm_bl_chunks[rank], cumm_bl_chunks[rank+1]):
                 print 'Process {0:0d} working on baseline chunk # {1:0d} ...'.format(rank, bl_chunk[i])
-        
+
                 outfile = rootdir+project_dir+simid+sim_dir+'_part_{0:0d}'.format(i)
                 ia = RI.InterferometerArray(labels[baseline_bin_indices[bl_chunk[i]]:min(baseline_bin_indices[bl_chunk[i]]+baseline_chunk_size,total_baselines)], bl[baseline_bin_indices[bl_chunk[i]]:min(baseline_bin_indices[bl_chunk[i]]+baseline_chunk_size,total_baselines),:], chans, telescope=telescope, latitude=latitude, longitude=longitude, altitude=altitude, A_eff=A_eff, layout=layout_info, freq_scale='GHz', pointing_coords='hadec', gaininfo=gaininfo)
-                
+
                 progress = PGB.ProgressBar(widgets=[PGB.Percentage(), PGB.Bar(marker='-', left=' |', right='| '), PGB.Counter(), '/{0:0d} Snapshots '.format(n_acc), PGB.ETA()], maxval=n_acc).start()
                 for j in range(n_acc):
                     roi_ind_snap = fits.getdata(roifile+'.fits', extname='IND_{0:0d}'.format(j))
@@ -2264,12 +2264,12 @@ else: # MPI based on baseline multiplexing
                     else:
                         # timestamp = lst[j]
                         timestamp = timestamps[j]
-                 
+
                     ts = time.time()
                     if j == 0:
                         ts0 = ts
-                  
-                    ia.observe(timestamp, Tsysinfo, bpass, pointings_hadec[j,:], skymod, t_acc[j], pb_info=pbinfo, brightness_units=flux_unit, bpcorrect=noise_bpcorr, roi_info={'ind': roi_ind_snap, 'pbeam': roi_pbeam_snap}, roi_radius=None, roi_center=None, lst=lst[j], gradient_mode=gradient_mode, memsave=memsave)
+
+                    ia.observe(timestamp, Tsysinfo, bpass, pointings_hadec[j,:], skymod, t_acc[j], pb_info=pbinfo, brightness_units=flux_unit, bpcorrect=noise_bpcorr, roi_info={'ind': roi_ind_snap, 'pbeam': roi_pbeam_snap}, roi_radius=None, roi_center=None, lst=lst[j], gradient_mode=gradient_mode, memsave=memsave, memuse=memory_use_per_process)
                     te = time.time()
                     # print '{0:.1f} seconds for snapshot # {1:0d}'.format(te-ts, j)
                     del roi_ind_snap
@@ -2285,8 +2285,8 @@ else: # MPI based on baseline multiplexing
                 ia.delay_transform(oversampling_factor-1.0, freq_wts=window*NP.abs(ant_bpass)**2)
                 ia.project_baselines(ref_point={'location': ia.pointing_center, 'coords': ia.pointing_coords})
                 ia.save(outfile, fmt=savefmt, verbose=True, tabtype='BinTableHDU', npz=False, overwrite=True, uvfits_parms=None)
-        pte_str = str(DT.datetime.now())                
- 
+        pte_str = str(DT.datetime.now())
+
 if rank == 0:
     parmsfile = rootdir+project_dir+simid+meta_dir+'simparms.yaml'
     with open(parmsfile, 'w') as pfile:
@@ -2305,7 +2305,7 @@ if rank == 0:
             sky_sector_str = '_all_sky_'
         else:
             sky_sector_str = '_sky_sector_{0:0d}_'.format(k)
-    
+
         if mpi_on_bl:
             progress = PGB.ProgressBar(widgets=[PGB.Percentage(), PGB.Bar(marker='-', left=' |', right='| '), PGB.Counter(), '/{0:0d} Baseline chunks '.format(n_bl_chunks), PGB.ETA()], maxval=n_bl_chunks).start()
             for i in range(0, n_bl_chunks):
@@ -2315,13 +2315,13 @@ if rank == 0:
                 else:
                     simvis_next = RI.InterferometerArray(None, None, None, init_file=blchunk_infile)
                     simvis.concatenate(simvis_next, axis=0)
-    
+
                 if cleanup >= 1:
                     if os.path.isfile(blchunk_infile+'.'+savefmt.lower()):
                         os.remove(blchunk_infile+'.'+savefmt.lower())
                     if os.path.isfile(blchunk_infile+'.gains.hdf5'):
                         os.remove(blchunk_infile+'.gains.hdf5')
-                    
+
                 progress.update(i+1)
             progress.finish()
 
@@ -2335,17 +2335,17 @@ if rank == 0:
                 bw_chunk_str = '{0:0d}x{1:.1f}_kHz'.format(nchan_chunk, freq_resolution/1e3)
                 freqchunk_infile = rootdir+project_dir+simid+sim_dir+'_part_{0:0d}'.format(i)
                 if i == 0:
-                    simvis = RI.InterferometerArray(None, None, None, init_file=freqchunk_infile)    
+                    simvis = RI.InterferometerArray(None, None, None, init_file=freqchunk_infile)
                 else:
-                    simvis_next = RI.InterferometerArray(None, None, None, init_file=freqchunk_infile)    
+                    simvis_next = RI.InterferometerArray(None, None, None, init_file=freqchunk_infile)
                     simvis.concatenate(simvis_next, axis=1)
-    
+
                 if cleanup > 1:
                     if os.path.isfile(freqchunk_infile+'.'+savefmt.lower()):
                         os.remove(freqchunk_infile+'.'+savefmt.lower())
                     if os.path.isfile(freqchunk_infile+'.gains.hdf5'):
                         os.remove(freqchunk_infile+'.gains.hdf5')
-                    
+
                 progress.update(i+1)
             progress.finish()
 
@@ -2376,7 +2376,7 @@ if rank == 0:
                     phase_center_coords = 'radec'
                 if phase_center_coords != 'radec':
                     raise ValueError('Invalid phase center coordinate system')
-                    
+
                 uvfits_ref_point = {'location': phase_center.reshape(1,-1), 'coords': 'radec'}
             else:
                 uvfits_ref_point = {'location': NP.asarray(save_formats['phase_center']).reshape(1,-1), 'coords': 'radec'}
@@ -2390,7 +2390,7 @@ if rank == 0:
     if cleanup >= 2:
         dir_to_be_removed = rootdir+project_dir+simid+roi_dir
         shutil.rmtree(dir_to_be_removed, ignore_errors=True)
-            
+
 print 'Process {0} has completed.'.format(rank)
 if diagnosis_parms['wait_after_run']:
     PDB.set_trace()
