@@ -7669,7 +7669,8 @@ class InterferometerData(object):
                     XYZ = utils.XYZ_from_LatLonAlt(*loc_array)
                 else:
                     XYZ = self.infodict['telescope_location']
-                ant_hdu.header['ARRAYX'] = XYZ[0]                ant_hdu.header['ARRAYY'] = XYZ[1]
+                ant_hdu.header['ARRAYX'] = XYZ[0]
+                ant_hdu.header['ARRAYY'] = XYZ[1]
                 ant_hdu.header['ARRAYZ'] = XYZ[2]
                 if uvdata_module_found:
                     ant_hdu.header['FRAME'] = 'ITRF'
