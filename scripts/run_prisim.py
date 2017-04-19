@@ -1819,7 +1819,7 @@ if mpi_on_src:
     src_chunk = range(len(src_bin_indices))
     n_src_chunks = len(src_bin_indices)
 elif mpi_on_freq:
-    frequency_chunk_size = int(NP.floor(1.0 * nchan / n_chunks))
+    frequency_chunk_size = int(NP.floor(1.0 * nchan / nproc))
     frequency_bin_indices = range(0, nchan, frequency_chunk_size)
     if frequency_bin_indices[-1] == nchan-1:
         if frequency_chunk_size > 2:
