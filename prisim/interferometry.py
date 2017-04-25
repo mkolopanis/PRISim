@@ -5193,7 +5193,7 @@ class InterferometerArray(object):
                 downsize_factor = NP.ceil(memory_required/float(memory_available))
                 n_src_stepsize = int(len(m2)/downsize_factor)
                 # src_indices = range(0,len(m2),n_src_stepsize)
-                src_indices = range(0,len(m2),1)
+                src_indices = range(0,len(m2),5)
                 if memsave:
                     print '\t\tEnforcing single precision computations.'
                     for i in xrange(len(src_indices)):
