@@ -1,3 +1,104 @@
+From bb62b35 (master):
+=====================
+
+In prisim/examples/simparms/defaultparms.yaml,
+
+(*) Add parameter custom_reffreq to specify reference frequency for
+the custom catalog
+
+In scripts/run_prisim.py,
+
+(*) Replace hard-coded reference frequency for the custom catalog
+with the one read from the parameter file now updated as above
+
+From cce8bf8 (master):
+=====================
+
+In scripts/run_prisim.py,
+
+(*) Import UVBeam module from pyuvdata
+(*) Integrate use of uvdata.UVBeam module to use external beams
+in UVBeam format
+
+In prisim/examples/simparms/defaultparms.yaml,
+
+(*) Indicate option to input external beams in UVBeam format
+
+From d71c10e (closure):
+======================
+
+In prisim/delay_spectrum.py,
+
+(*) Minor changes in docstring of member function
+compute_closure_phase_power_spectrum() of class DelayPowerSpectrum
+
+From 343af6e (closure):
+======================
+
+In prisim/interferometry.py,
+
+(*) In member function getClosurePhase() of class InterferometerArray,
+incorporate respective bandpass weights into the visibility triplets 
+before returning their phases
+
+In prisim/delay_spectrum.py,
+
+(*) In member function subband_delay_transform_closure_phase() of
+class DelaySpectrum, in determining quantities lag_kernel and delay
+spectrum of closure phases, exclude using the attribute bp (bandpass
+shape) and only use freq_wts.
+(*) In member function subband_delay_transform_closure_phase() of
+class DelaySpectrum, use negative sign in the exponent while computing
+the complex exponential from closure phase
+
+From 16158f8 (closure):
+======================
+
+In prisim/interferometry.py,
+
+(*) In member function getClosurePhase() of class InterferometerArray,
+add triplets of baseline vectors in the returned dictionary under key
+'baseline_triplets'. Update member function docstring accordingly
+
+In prisim/delay_spectrum.py,
+
+(*) In member function subband_delay_transform_closure_phase() of
+class DelaySpectrum, add triplets of baseline vectors in the returned
+dictionary under key 'baseline_triplets'. Update member function
+docstring accordingly
+(*) Add member function compute_closure_phase_power_spectrum() along
+with docstring in class DelayPowerSpectrum to compute delay power
+spectrum of closure phases. Update class docstring accordingly
+
+From 6b3b9f6 (closure):
+======================
+
+In prisim/delay_spectrum.py,
+
+(*) Add member function subband_delay_transform_closure_phase() along
+with docstring to class DelaySpectrum. Update class docstring
+accordingly
+(*) minor updates to docstring of class DelaySpectrum
+
+From f36cce1 (master):
+=====================
+
+In prisim/interferometry.py,
+
+(*) In member function getClosurePhase() of class InterferometerArray,
+add output closure phases of thermal noise on visibilities. Update
+member function docstring accordingly
+
+From 2b5384e (master):
+=====================
+
+In prisim/interferometry.py,
+
+(*) In fuction uniq_baselines(), increase precision of baseline
+orientation when determining unique baselines
+(*) In function getBaselineInfo(), raise warning instead of error
+when no redundant baselines are found
+
 From 86cb163 (closure):
 ======================
 

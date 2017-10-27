@@ -1186,7 +1186,7 @@ def uniq_baselines(baseline_locations, redundant=None):
     bll = NP.sqrt(NP.sum(baseline_locations**2, axis=1))
     blza = NP.degrees(NP.arccos(baseline_locations[:,2] / bll))
 
-    blstr = ['{0[0]:.2f}_{0[1]:.3f}_{0[2]:.3f}'.format(lo) for lo in zip(bll,blza,blo)]
+    blstr = ['{0[0]:.2f}_{0[1]:.3f}_{0[2]:.3f}'.format(lo) for lo in zip(bll,3.6e3*blza,3.6e3*blo)]
 
     uniq_blstr, ind, invind = NP.unique(blstr, return_index=True, return_inverse=True)  ## if numpy.__version__ < 1.9.0
 
@@ -1726,8 +1726,9 @@ def getBaselineInfo(inpdict):
                 # blgroups_reversemap[tuple(lbl)] = tuple(label)
                 blgroups_reversemap[tuple(lbl)] = NP.asarray([label], dtype=bl_label.dtype)
     
-    if bl_label_orig.size == bl_label.size:
-        raise ValueError('No redundant baselines found.')
+    if array_is_redundant:
+        if bl_label_orig.size == bl_label.size:
+            warnings.warn('No redundant baselines found. Proceeding...')
 
     outdict = {'bl': bl, 'id': bl_id, 'label': bl_label, 'groups': blgroups, 'reversemap': blgroups_reversemap, 'redundancy': redundancy, 'layout_info': layout_info}
     return outdict
@@ -6314,7 +6315,7 @@ class InterferometerArray(object):
 
         Tuple containing two lists. The first list is a list of triplet tuples of
         antenna ids in the form [(a1,a2,a3), (a1,a4,a6), ...], the second list 
-        is a list of triplet tuples of baselines as encoded as strings
+        is a list of triplet tuples of baselines encoded as strings
         -------------------------------------------------------------------------
         """
 
@@ -6409,9 +6410,21 @@ class InterferometerArray(object):
                                 the given antenna triplets for noisy 
                                 visibilities. It is of shape
                                 ntriplets x nchan x ntimes
+        'closure_phase_noise'   [numpy array] Closure phases (in radians) for
+                                the given antenna triplets for thermal noise in
+                                visibilities. It is of shape
+                                ntriplets x nchan x ntimes
         'antenna_triplets'      [list of tuples] List of three-element tuples of 
                                 antenna IDs for which the closure phases are
                                 calculated.
+        'baseline_triplets'     [numpy array] List of 3x3 numpy arrays. Each 3x3
+                                unit in the list represents triplets of baseline
+                                vectors where the three rows denote the three 
+                                baselines in the triplet and the three columns 
+                                define the x-, y- and z-components of the 
+                                triplet. The number of 3x3 unit elements in the 
+                                list will equal the number of elements in the 
+                                list under key 'antenna_triplets'. 
         -------------------------------------------------------------------------
         """
 
@@ -6423,7 +6436,10 @@ class InterferometerArray(object):
 
         phase_skyvis123 = []
         phase_vis123 = []
+        phase_noise123 = []
+        blvecttriplets = []
         for anttriplet in antenna_triplets:
+            blvecttriplets += [NP.zeros((3,3))]
             a1, a2, a3 = anttriplet
             a1 = str(a1)
             a2 = str(a2)
@@ -6441,9 +6457,15 @@ class InterferometerArray(object):
             if not conj12:
                 skyvis12 = self.skyvis_freq[ind12,:,:]
                 vis12 = self.vis_freq[ind12,:,:]
+                noise12 = self.vis_noise_freq[ind12,:,:]
+                blvecttriplets[-1][0,:] = self.baselines[ind12,:]
+                bpwts12 = self.bp[ind12,:,:] * self.bp_wts[ind12,:,:]
             else:
                 skyvis12 = self.skyvis_freq[ind12,:,:].conj()
                 vis12 = self.vis_freq[ind12,:,:].conj()
+                noise12 = self.vis_noise_freq[ind12,:,:].conj()
+                blvecttriplets[-1][0,:] = -self.baselines[ind12,:]
+                bpwts12 = self.bp[ind12,:,:].conj() * self.bp_wts[ind12,:,:].conj()
 
             bl23_id = (a3, a2)
             conj23 = False
@@ -6458,9 +6480,15 @@ class InterferometerArray(object):
             if not conj23:
                 skyvis23 = self.skyvis_freq[ind23,:,:]
                 vis23 = self.vis_freq[ind23,:,:]
+                noise23 = self.vis_noise_freq[ind23,:,:]
+                blvecttriplets[-1][1,:] = self.baselines[ind23,:]
+                bpwts23 = self.bp[ind23,:,:] * self.bp_wts[ind23,:,:]
             else:
                 skyvis23 = self.skyvis_freq[ind23,:,:].conj()
                 vis23 = self.vis_freq[ind23,:,:].conj()
+                noise23 = self.vis_noise_freq[ind23,:,:].conj()
+                blvecttriplets[-1][1,:] = -self.baselines[ind23,:]
+                bpwts23 = self.bp[ind23,:,:].conj() * self.bp_wts[ind23,:,:].conj()
 
             bl31_id = (a1, a3)
             conj31 = False
@@ -6475,14 +6503,21 @@ class InterferometerArray(object):
             if not conj31:
                 skyvis31 = self.skyvis_freq[ind31,:,:]
                 vis31 = self.vis_freq[ind31,:,:]
+                noise31 = self.vis_noise_freq[ind31,:,:]
+                blvecttriplets[-1][2,:] = self.baselines[ind31,:]
+                bpwts31 = self.bp[ind31,:,:] * self.bp_wts[ind31,:,:]
             else:
                 skyvis31 = self.skyvis_freq[ind31,:,:].conj()
                 vis31 = self.vis_freq[ind31,:,:].conj()
+                noise31 = self.vis_noise_freq[ind31,:,:].conj()
+                blvecttriplets[-1][2,:] = -self.baselines[ind31,:]
+                bpwts31 = self.bp[ind31,:,:].conj() * self.bp_wts[ind31,:,:].conj()
 
-            phase_skyvis123 += [NP.angle(skyvis12*skyvis23*skyvis31)]
-            phase_vis123 += [NP.angle(vis12*vis23*vis31)]
+            phase_skyvis123 += [NP.angle(skyvis12*skyvis23*skyvis31 * bpwts12*bpwts23*bpwts31)]
+            phase_vis123 += [NP.angle(vis12*vis23*vis31 * bpwts12*bpwts23*bpwts31)]
+            phase_noise123 += [NP.angle(noise12*noise23*noise31 * bpwts12*bpwts23*bpwts31)]
 
-        return {'closure_phase_skyvis': NP.asarray(phase_skyvis123), 'closure_phase_vis': NP.asarray(phase_vis123), 'antenna_triplets': antenna_triplets}
+        return {'closure_phase_skyvis': NP.asarray(phase_skyvis123), 'closure_phase_vis': NP.asarray(phase_vis123), 'closure_phase_noise': NP.asarray(phase_noise123), 'antenna_triplets': antenna_triplets, 'baseline_triplets': blvecttriplets}
 
     #############################################################################
 

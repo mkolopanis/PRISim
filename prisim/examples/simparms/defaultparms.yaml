@@ -350,13 +350,14 @@ beam    :
 
     filefmt         : 'FITS'
                                 # File format for external beam file.
-                                # Accepted values are 'HDF5' and 'FITS'
+                                # Accepted values are 'HDF5', 'FITS',
+                                # and 'UVBeam' (pyuvdata UVBeam object)
 
     identifier      : 'HERA-CST'
                                 # string to identify source of beam
                                 # Any string. e.g. RB=Rich Bradley,
-                                # AN=Abraham Neben
-                                # DD=Dave DeBoer, or 'HERA-CST'
+                                # AN=Abraham Neben, DD=Dave DeBoer,
+                                # 'HERA-CST', NF=Nic Fagnoni, etc.
 
     pol             : 'X'
                                 # Beam polarization. Accepted values
@@ -643,6 +644,11 @@ fgparm   :
                                 # Accepted values are 'K' for
                                 # temperature in K or 'Jy' for flux
                                 # density in Jy
+
+    custom_reffreq  : 0.150
+                                # Catalog reference frequency (in GHz).
+                                # Applies only to custom catalog when
+                                # FG model is set to 'custom'
 
     flux_min        : 10.0
                                 # Flux density lower limit (Jy) to be 
