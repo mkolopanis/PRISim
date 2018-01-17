@@ -4,7 +4,8 @@ import multiprocessing as MP
 import itertools as IT
 import progressbar as PGB
 # import aipy as AP
-import astropy 
+import astropy
+
 from astropy.io import fits
 import astropy.cosmology as CP
 import scipy.constants as FCNST
@@ -2508,6 +2509,7 @@ class DelaySpectrum(object):
     #############################################################################
 
     def subband_delay_transform_closure_phase(self, bw_eff, antenna_triplets=None,
+                                              specsmooth_info=None,
                                               delay_filter_info=None,
                                               spectral_window_info=None,
                                               freq_center=None, shape=None, 
@@ -2533,6 +2535,31 @@ class DelaySpectrum(object):
                     triplet is given as a tuple. If set to None (default), all
                     the unique triplets based on the antenna layout attribute
                     in class InterferometerArray
+
+        specsmooth_info         
+                    [NoneType or dictionary] Spectral smoothing window to be 
+                    applied prior to the delay transform. If set to None, no 
+                    smoothing is done. This is usually set if spectral 
+                    smoothing is to be done such as in the case of RFI. The 
+                    smoothing window parameters are specified using the
+                    following keys and values:
+                    'op_type'     [string] Smoothing operation type. 
+                                  Default='median' (currently accepts only 
+                                  'median' or 'interp'). 
+                    'window_size' [integer] Size of smoothing window (in 
+                                  pixels) along frequency axis. Applies only
+                                  if op_type is set to 'median'
+                    'maskchans'   [NoneType or numpy array] Numpy boolean array
+                                  of size nchan. False entries imply those
+                                  channels are not masked and will be used in 
+                                  in interpolation while True implies they are
+                                  masked and will not be used in determining the
+                                  interpolation function. If set to None, all
+                                  channels are assumed to be unmasked (False).
+                    'evalchans'   [NoneType or numpy array] Channel numbers at 
+                                  which visibilities are to be evaluated. Will 
+                                  be useful for filling in RFI flagged channels.
+                                  If set to None, all channels will be evaluated
 
         delay_filter_info
                     [NoneType or dictionary] Info containing delay filter 
@@ -2568,34 +2595,30 @@ class DelaySpectrum(object):
                                 to 'discard', the horizon-to-horizon is 
                                 filtered out (discarded).
 
-        spectral_window_info    [NoneType or dictionary] Spectral window 
-                                parameters to determine the spectral weights and
-                                apply to the visibilities in the frequency 
-                                domain before filtering in the delay domain. 
-                                THESE PARAMETERS ARE APPLIED ON THE INDIVIDUAL 
-                                VISIBILITIES THAT GO INTO THE CLOSURE PHASE. 
-                                THESE ARE NOT TO BE CONFUSED WITH THE PARAMETERS
-                                THAT WILL BE USED IN THE ACTUAL DELAY TRANSFORM 
-                                OF CLOSURE PHASE SPECTRA WHICH ARE SPECIFIED
-                                SEPARATELY FURTHER BELOW. 
-                                If set to None (default), unity spectral weights 
-                                are applied. If spectral weights are to be 
-                                applied, it must be a provided as a dictionary 
-                                with the following keys and values:
-                                bw_eff       [scalar] effective bandwidths (in 
-                                             Hz) for the spectral window
-                                freq_center  [scalar] frequency center (in Hz) 
-                                             for the spectral window
-                                shape        [string] frequency window shape for 
-                                             the spectral window. Accepted 
-                                             values are 'rect' or 'RECT' (for 
-                                             rectangular), 'bnw' and 'BNW' (for 
-                                             Blackman-Nuttall), and 'bhw' or 
-                                             'BHW' (for Blackman-Harris). 
-                                             Default=None sets it to 'rect' 
-                                fftpow       [scalar] power to which the FFT of 
-                                             the window will be raised. The 
-                                             value must be a positive scalar. 
+        spectral_window_info    
+                    [NoneType or dictionary] Spectral window parameters to 
+                    determine the spectral weights and apply to the visibilities 
+                    in the frequency domain before filtering in the delay domain. 
+                    THESE PARAMETERS ARE APPLIED ON THE INDIVIDUAL VISIBILITIES 
+                    THAT GO INTO THE CLOSURE PHASE. THESE ARE NOT TO BE CONFUSED 
+                    WITH THE PARAMETERS THAT WILL BE USED IN THE ACTUAL DELAY 
+                    TRANSFORM OF CLOSURE PHASE SPECTRA WHICH ARE SPECIFIED
+                    SEPARATELY FURTHER BELOW. 
+                    If set to None (default), unity spectral weights are applied. 
+                    If spectral weights are to be applied, it must be a provided 
+                    as a dictionary with the following keys and values:
+                    bw_eff       [scalar] effective bandwidths (in Hz) for the 
+                                 spectral window
+                    freq_center  [scalar] frequency center (in Hz) for the 
+                                 spectral window
+                    shape        [string] frequency window shape for the 
+                                 spectral window. Accepted values are 'rect' or 
+                                 'RECT' (for rectangular), 'bnw' and 'BNW' (for 
+                                 Blackman-Nuttall), and 'bhw' or 'BHW' (for 
+                                 Blackman-Harris). Default=None sets it to 'rect' 
+                    fftpow       [scalar] power to which the FFT of the window 
+                                 will be raised. The value must be a positive 
+                                 scalar. 
 
         freq_center [scalar, list or numpy array] frequency centers (in Hz) of 
                     the selected frequency windows for subband delay transform 
@@ -2823,7 +2846,7 @@ class DelaySpectrum(object):
                 if verbose:
                     print '\tPad fraction found to be negative. Resetting to 0.0 (no padding will be applied).'
 
-        cpinfo = self.ia.getClosurePhase(antenna_triplets=antenna_triplets, delay_filter_info=delay_filter_info, spectral_window_info=spectral_window_info)
+        cpinfo = self.ia.getClosurePhase(antenna_triplets=antenna_triplets, specsmooth_info=specsmooth_info, delay_filter_info=delay_filter_info, spectral_window_info=spectral_window_info)
         result = {'antenna_triplets': cpinfo['antenna_triplets'], 'baseline_triplets': cpinfo['baseline_triplets']}
 
         freq_wts = NP.empty((bw_eff.size, self.f.size), dtype=NP.float_)
@@ -2855,6 +2878,7 @@ class DelaySpectrum(object):
         # lag_kernel = DSP.FT1D(NP.pad(self.bp[:,NP.newaxis,:,:] * freq_wts[NP.newaxis,:,:,NP.newaxis], ((0,0),(0,0),(0,npad),(0,0)), mode='constant'), ax=2, inverse=True, use_real=False, shift=True) * (npad + self.f.size) * self.df
         lag_kernel = DSP.FT1D(NP.pad(freq_wts[NP.newaxis,:,:,NP.newaxis], ((0,0),(0,0),(0,npad),(0,0)), mode='constant'), ax=2, inverse=True, use_real=False, shift=True) * (npad + self.f.size) * self.df
         result = {'freq_center': freq_center, 'shape': shape, 'freq_wts': freq_wts, 'bw_eff': bw_eff, 'npad': npad, 'lags': lags, 'lag_kernel': lag_kernel, 'lag_corr_length': self.f.size / NP.sum(freq_wts, axis=1)}
+
         for key in cpinfo:
             if key in ['closure_phase_skyvis', 'closure_phase_vis', 'closure_phase_noise']:
                 # result[key] = DSP.FT1D(NP.pad(NP.exp(-1j*cpinfo[key][:,NP.newaxis,:,:]) * self.bp[:,NP.newaxis,:,:] * freq_wts[NP.newaxis,:,:,NP.newaxis], ((0,0),(0,0),(0,npad),(0,0)), mode='constant'), ax=2, inverse=True, use_real=False, shift=True) * (npad + self.f.size) * self.df
