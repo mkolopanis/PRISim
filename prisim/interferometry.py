@@ -6670,6 +6670,7 @@ class InterferometerArray(object):
                 self.gradient[self.gradient_mode] = NP.repeat(self.gradient[self.gradient_mode], num_list, axis=1)
             self.labels = NP.asarray(uniq_inplabels, dtype=self.labels.dtype)
             self.baselines = NP.repeat(self.baselines, num_list, axis=0)
+            self.projected_baselines = NP.repeat(self.projected_baselines, num_list, axis=0)
             self.baseline_lengths = NP.repeat(self.baseline_lengths, num_list)
             if self.Tsys.shape[0] > 1:
                 self.Tsys = NP.repeat(self.Tsys, num_list, axis=0)
@@ -6917,6 +6918,18 @@ class InterferometerArray(object):
                                   be useful for filling in RFI flagged channels.
                                   If set to None, channels masked in 'maskchans' 
                                   will be evaluated
+                    'noiseRMS'    [NoneType or scalar or numpy array] If set to 
+                                  None (default), the rest of the parameters are 
+                                  used in determining the RMS of thermal noise. 
+                                  If specified as scalar, all other parameters 
+                                  will be ignored in estimating noiseRMS and 
+                                  this value will be used instead. If specified 
+                                  as a numpy array, it must be of shape 
+                                  broadcastable to (nbl,nchan,ntimes). So 
+                                  accpeted shapes can be (1,1,1), (1,1,ntimes), 
+                                  (1,nchan,1), (nbl,1,1), (1,nchan,ntimes), 
+                                  (nbl,nchan,1), (nbl,1,ntimes), or 
+                                  (nbl,nchan,ntimes). 
 
         spectral_window_info    
                     [NoneType or dictionary] Spectral window parameters to 

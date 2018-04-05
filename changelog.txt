@@ -1,3 +1,111 @@
+From f3c3107 (phasing):
+======================
+
+In prisim/interferometry.py,
+
+(*) In member function duplicate_measurements() of class
+InterferometerArray, duplicate attribute projected_baselines to the
+required shape
+
+From 7c44eb3 (master):
+=====================
+
+In scripts/run_prisim.py,
+
+(*) Rotate visibilities to the phase reference before duplicating the
+redundant visibilities and saving in UVFITS format. 
+
+From d158bd9 (cp-fixes):
+=======================
+
+In prisim/delay_spectrum.py,
+
+(*) Modify default cosmology to Planck 2015 xiii results with
+H0=100 km/s/Mpc
+(*) In member function subband_delay_transform_closure_phase() of class
+DelaySpectrum, units of closure phase delay spectrum returned is in Hz.
+(*) In member functions compute_averaged_closure_phase_power_spectrum()
+and compute_individual_closure_phase_power_spectrum() of class
+DelayPowerSpectrum, the input closure phase delay spectra are in units
+of Hz and the output delay power spectra of closure phases are in units
+of Mpc/h.
+
+From 8b5a2f3 (cp-fixes):
+=======================
+
+In prisim/delay_spectrum.py,
+
+(*) Change units of closure phase delay spectra in docstring of member
+function subband_delay_transform_closure_phase() of class
+DelaySpectrum
+
+From 1638739 (cp-fixes):
+=======================
+
+In prisim/delay_spectrum.py,
+
+(*) In member function compute_averaged_closure_phase_power_spectrum()
+of class DelayPowerSpectrum, check for presence of keys in dictionary,
+shapes of various quantities, and the math of cross-power spectrum
+(*) Fix math in subband_delay_transform_closure_phase() of class
+DelayPowerSpectrum
+
+From 4838e42 (cp-fixes):
+=======================
+
+In prisim/delay_spectrum.py,
+
+(*) Update member function subband_delay_transform_closure_phase() in
+class DelaySpectrum to handle any dimension for closure phase inputs.
+Update member function docstring accordingly
+
+From 4bef2c2 (closure):
+======================
+
+In prisim/delay_spectrum.py,
+
+(*) Change use of axis keyword throughout member function
+subband_delay_transform_closure_phase() of class DelaySpectrum
+
+From 99a8c08 (closure):
+======================
+
+In prisim/delay_spectrum.py,
+
+(*) Rename member function compute_closure_phase_power_spectrum()
+of class DelayPowerSpectrum to
+compute_individual_closure_phase_power_spectrum(). Update docstring
+of class and member function accordingly
+
+(*) Add member function
+compute_averaged_closure_phase_power_spectrum() to class
+DelayPowerSpectrum. Update class docstring accordingly
+
+From 5f9ea23 (closure):
+======================
+
+In prisim/delay_spectrum.py,
+
+(*) Check for presence of keys in input closure_phase_delay_spectra
+in member function compute_closure_phase_power_spectrum() of class
+DelayPowerSpectrum. Update docstring accordingly
+
+From 6aecec0 (closure):
+======================
+
+In prisim/interferometry.py,
+
+(*) Update docstring of member function getClosurePhase() of class
+InterferometerArray to include description of value under key
+'noiseRMS' in input specsmooth_info
+
+In prisim/delay_spectrum.py,
+
+(*) Update docstring of member function
+subband_delay_transform_closure_phase() of class DelaySpectrum to
+include description of value under key 'noiseRMS' in input
+specsmooth_info
+
 From 60fa8a8 (closure):
 ======================
 
