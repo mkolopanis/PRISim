@@ -1,3 +1,423 @@
+From 26dbdb0 (master):
+=====================
+
+In prisim/bispectrum_phase.py,
+
+(*) Import reduce from functools module
+(*) Add member functions rescale_power_spectrum() and
+average_rescaled_power_spectrum() to class ClosurePhaseDelaySpectrum
+with docstrings to rescale the power spectrum of ratio to power of a
+quantity with physical units and to average this rescaled power along
+the specified axes respectively. Update docstring accordingly
+(*) Include values under keys 'fftpow' in output of member function
+FT() of class ClosurePhaseDelaySpectrum. Update member function
+docstring accordingly
+(*) Include values under keys 'fftpow', 'freq_center', 'freq_wts',
+'bw_eff', 'shape', 'lag_corr_length' and 'fftpow' in output dictionary 
+of member function compute_power_spectrum() of class
+ClosurePhaseDelaySpectrum. Update member function docstring
+accordingly.
+(*) Additional minor updates to docstring of member function
+compute_power_spectrum() of class ClosurePhaseDelaySpectrum.
+
+
+From 7c18537 (pbeam):
+====================
+
+Throughout the PRISim package,
+
+(*) Change print statements to print functions to be compatible with
+Python 3
+
+In prisim/interferometry.py,
+
+(*) Change some print functions to warnings
+
+From d6dd62c (pbeam):
+====================
+
+In prisim/interferometry.py,
+
+(*) In member function append_settings() of class ROI_parameters,
+handle appropriately when ROI ind is passed as an empty array.
+(*) In member function observe() of class InterferometerArray,
+handle appropriately when ROI ind is passed as an empty array.
+
+From 0076c70 (pbeam):
+====================
+
+In prisim/primary_beams.py,
+
+(*) In function airy_disk_pattern(), remove keyword input
+gaussian_approx. Update function docstring accordingly
+(*) In function primary_beam_generator(), remove usage of keyword
+input gaussian_approx in calls to airy_disk_pattern()
+
+From 8cee83e (closure-adv):
+==========================
+
+In prisim/examples/simparms/defaultparms.yaml,
+
+(*) Add 'gaussian' as one of the available antenna element shape
+parameters
+
+In prisim/primary_beams.py,
+
+(*) Add function gaussian_beam() along with docstring to compute
+a Gaussian voltage or power pattern.
+(*) In function primary_beam_generator(), include call to
+gaussian_beam() if telescope shape parameter is set to 'gaussian'.
+Update function docstring accordingly
+
+In scripts/run_prisim.py,
+
+(*) Add checks and accept inputs for antenna aperture shape that is
+'gaussian' in accordance with the changes above.
+
+From f5a1dec (closure-adv):
+==========================
+
+In setup.py,
+
+(*) Update Astropy version range in setup.py 
+
+From e0a90a1 (closure-adv):
+==========================
+
+(*) Rename prisim/closure.py to prisim/bispectrum_phase.py
+
+From 2c2c7e1 (closure-adv):
+==========================
+
+In prisim/closure.py,
+
+(*) In member function FT() of class ClosurePhaseDelaySpectrum, fix
+interval in call to LKP.find_1NN()
+(*) In member function compute_power_spectrum() of class
+ClosurePhaseDelaySpectrum, change default behavior of input incohax.
+Update member function docstring accordingly
+
+From d1d2465 (closure-adv):
+==========================
+
+In prisim/closure.py,
+
+(*) Add function loadnpz() along with docstring to read an input NPZ
+file and return the loaded data
+(*) In member function __init__() of class ClosurePhase, update the
+loading of data through loadnpz() instead of through npz2hdf5()
+(*) In member function smooth_in_tbins() of class ClosurePhase, check
+for presence of certain 'prelim' under 'processed' before assigning
+them.
+
+From cd8ad7f (closure-adv):
+==========================
+
+In prisim/closure.py,
+
+(*) In function npz2hdf5(), check for presence of files 'std_dev_triad',
+'averaged_closures', and 'std_dev_lst' in the input NPZ file before
+reading them and writing to the output HDF5 file.
+
+From 65321a2 (closure-adv):
+==========================
+
+In prisim/closure.py,
+
+(*) Remove function interpolate_eicp_spectrum() and related imports
+as they has been moved to AstroUtils in mathops.py
+
+From 8681f1b (closure-adv):
+==========================
+
+In prisim/closure.py,
+
+(*) Add function interpolate_eicp_spectrum() along with docstring to
+interpolate and fill missing values in complex exponential spectrum of
+closure phases
+
+In prisim/interferometry.py,
+
+(*) Minor correction of typo in a docstring 
+
+From cd59b25 (closure-adv):
+==========================
+
+In prisim/closure.py,
+
+(*) In function npz2hdf5(), add inputs latitude and longitude. Update
+docstring accordingly. Replace hard-coded latitude and longitude with
+these inputs
+
+From 4deafc2 (closure-adv):
+==========================
+
+In prisim/closure.py,
+
+(*) In function npz2hdf5(), update LST parsing. Add key 'lst-day' to
+HDF5 file
+
+From a249439 (closure-adv):
+==========================
+
+In prisim/closure.py,
+
+(*) In member function compute_power_spectrum() of class
+ClosurePhaseDelaySpectrum, add input keyword cohax to specify axes along
+which coherent averaging of clousre phases can be performed. Update
+member function docstring accordingly
+(*) Change default for keyword input incohax in member function
+compute_power_spectrum() of class ClosurePhaseDelaySpectrum. Update
+member function docstring accordingly
+(*) In member function compute_power_spectrum() of class
+ClosurePhaseDelaySpectrum, perform coherent averaging of closure phase
+delay spectra before incoherent averaging of closure phase delay power
+spectra
+
+From 45acc97 (closure-adv):
+==========================
+
+In prisim/closure.py,
+
+(*) In member function subset() of class ClosurePhaseDelaySpectrum,
+update functionality to select and return indices of triads, LST, and
+days. Update member function docstring accordingly.
+(*) In member function compute_power_spectrum() of class
+ClosurePhaseDelaySpectrum, update call to member function subset()
+based on the changes above. Update member function docstring
+accordingly
+(*) In member function compute_power_spectrum() of class
+ClosurePhaseDelaySpectrum, update the vaiable named results
+
+From 6d690c1 (closure-adv):
+==========================
+
+In prisim/closure.py,
+
+(*) In member function smooth_in_tbins() of class ClosurePhase,
+make corrections in LST and Day binning
+(*) In member function FT() of class ClosurePhaseDelaySpectrum,
+update with processing the right axes. Update member function
+docstring accordingly
+
+From a376965 (closure-adv):
+==========================
+
+In prisim/closure.py,
+
+(*) Import Time module from astropy
+(*) In function npz2hdf5(), read in LST and days as instances of
+astropy Time class
+(*) In member function smooth_in_tbins() of class ClosurePhase,
+add input keyword daybinsize. Update member function docstring
+accordingly
+(*) In member function smooth_in_tbins() of class ClosurePhase,
+process smoothing along both the Day and LST axes.
+
+From 544995b (closure-adv):
+==========================
+
+In prisim/closure.py,
+
+(*) In member function smooth_in_tbins() of class ClosurePhase, and
+everywhere else, edit all occurrences of tbin to lstbin, including
+input tbinsize. Update docstring accordingly
+
+From da41b53 (closure-adv):
+==========================
+
+In prisim/closure.py,
+
+(*) Modify attributes of class ClosurePhase to adjust for the new
+NPZ format. Update class docstring accordingly
+(*) Modify __init__() member function of class ClosurePhase to adjust
+for the new NPZ format. Update member function docstring accordingly
+
+From d8380ca (closure):
+======================
+
+In prisim/closure.py,
+
+(*) In function npz2hdf5(), process based on new NPZ file format.
+Update docstring accordingly
+(*) Convert Local Apparent Sidereal Time to MJD from CASA convention
+by subtracting 6713.
+
+From 78419d3 (closure):
+======================
+
+In prisim/closure.py,
+
+(*) In member function FT() of class ClosurePhaseDelaySpectrum, add
+input keyword apply_flags to include or exclude flag information in
+the delay transform. Update member function docstring accordingly.
+Process flags accordingly
+
+From c40eac9 (closure):
+======================
+
+In prisim/closure.py,
+
+(*) In member function FT() of class ClosurePhaseDelaySpectrum,
+include flag weights in the Fourier transform
+
+From 256f4aa (closure):
+======================
+
+In prisim/closure.py,
+
+(*) Add keys 'tbins' and 'dtbins' in attribute dictionary cpinfo of
+class ClosurePhase. Update docstring of class ClosurePhase accordingly
+(*) Add keys 'triads', 'triads_ind', 'lst', 'lst_ind', 'dlst' in the
+dictionary returned by mymber function compute_power_spectrum() of
+class ClosurePhaseDelaySpectrum. Update member function docstring
+accordingly.
+
+From d9256a3 (closure):
+======================
+
+In prisim/closure.py,
+
+(*) Add member function subset() along with docstring under class
+ClosurePhaseDelaySpectrum. Update class docstring accordingly
+(*) Add input keyword selection to member function
+compute_power_spectrum() of class ClosurePhaseDelaySpectrum. Update
+member function docstring accordingly
+(*) Update format for input keyword cpds in member function
+compute_power_spectrum() of class ClosurePhaseDelaySpectrum. Update
+member function docstring accordingly
+
+From c5faaba (closure):
+======================
+
+In prisim/closure.py,
+
+(*) Import astropy.cosmology, scipy.constants, astroutils.constants,
+prisim.delay_spectrum
+(*) Specify default cosmology to be Planck 2015 cosmological
+parameters with H0 = 100 h km/s/Mpc
+(*) Add docstring to member function FT() of class
+ClosurePhaseDelaySpectrum
+(*) Add member function compute_power_spectrum() along with docstring
+under class ClosurePhaseDelaySpectrum. Update member function
+docstring accordingly
+(*) Update docstring of class ClosurePhaseDelaySpectrum with info on
+attribute cPhaseDS and cPhaseDS_resampled
+(*) Update docstring of class ClosurePhaseDelaySpectrum
+
+From 36465d0 (closure):
+======================
+
+In prisim/closure.py,
+
+(*) In member function __init__() of class ClosurePhaseDelaySpectrum,
+initialize attribute cPhaseDS_resampled
+(*) In member function FT() of class ClosurePhaseDelaySpectrum,
+assign results to attributes cPhaseDS and cPhaseDS_resampled.
+
+From d3cd4d8 (closure):
+======================
+
+In prisim/closure.py,
+
+(*) In member function FT() of class ClosurePhaseDelaySpectrum,
+add input keyword resmaple to request for resampling of the
+delay spectra at independent samples. Update docstring accordingly.
+(*) In member function FT() of class ClosurePhaseDelaySpectrum,
+add ability to resample and return either resampled or oversampled
+results
+
+From c5237ab (closure):
+======================
+
+In prisim/closure.py,
+
+(*) Import astroutils.lookup_operations
+(*) In member function FT() of class ClosurePhaseDelaySpectrum,
+estimate the Fourier transform in subbands
+
+From 4bb6b15 (closure):
+======================
+
+In prisim/closure.py,
+
+(*) In member function __init__() of class ClosurePhase, add input
+freqs for initialization. Update member function docstring
+accordingly
+(*) Add class ClosurePhaseDelaySpectrum along with docstring
+(*) Add member function __init__() and FT() along with respective
+docstrings under class ClosurePhaseDelaySpectrum
+(*) Initialize attributes cPhase, f, df, and cPhaseDS in member
+function __init__() of class ClosurePhase
+
+From b5e87ff (closure):
+======================
+
+In prisim/closure.py,
+
+(*) Update docstring of class ClosurePhaseDelaySpectrum
+(*) Update docstring of __init__() member function of class
+ClosurePhaseDelaySpectrum
+
+From aeef394 (closure):
+======================
+
+In prisim/closure.py,
+
+(*) Update docstring of class ClosurePhase
+(*) Start work on class ClosurePhaseDelaySpectrum
+
+From fb3cfea (closure):
+======================
+
+In prisim/closure.py,
+
+(*) Add member function smooth_in_tbins() under class ClosurePhase.
+Update class docstring accordingly
+
+From b13de6f (closure):
+======================
+
+In prisim/closure.py,
+
+(*) Fix bugs in function npz2hdf5()
+(*) Update docstring of function npz2hdf5() and member function
+__init__() of class ClosurePhase
+(*) Fix bugs in member functions __init__() and expicp() of class
+ClosurePhase
+
+From e614307 (closure):
+======================
+
+In prisim/closure.py,
+
+(*) Modify member function __init__() to call member function expicp()
+both of class ClosurePhase. Modify structure of dictionary attribute
+cpinfo to hold 'raw' and 'processed' data containers, and the latter
+contains 'native' and 'prelim' containers, each of which contains
+'eicp' and 'wts' keys
+(*) Modify member function expicp() of class ClosurePhase to compute
+the complex exponential and weights as masked arrays under keys
+'native/eicp' and 'native/wts' respectively
+
+From d525933 (closure):
+======================
+
+In prisim/closure.py,
+
+(*) Add member function expicp() along with docstring to class
+ClosurePhase. Update class docstring accordingly
+
+From bdb5e6b (closure), 94f15d0 (master):
+========================================
+
+(*) Merge master branch (94f15d0) on to closure branch (bdb5e6b)
+
+From 7c44eb3 (closure):
+======================
+
+(*) Add prisim/closure.py to repo to analyze closure phase data
+
 From f3c3107 (phasing):
 ======================
 
@@ -76,7 +496,6 @@ In prisim/delay_spectrum.py,
 of class DelayPowerSpectrum to
 compute_individual_closure_phase_power_spectrum(). Update docstring
 of class and member function accordingly
-
 (*) Add member function
 compute_averaged_closure_phase_power_spectrum() to class
 DelayPowerSpectrum. Update class docstring accordingly
