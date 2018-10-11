@@ -9237,6 +9237,10 @@ class InterferometerData(object):
                     setattr(dataobj, attrkey, 'phased')
                 else:
                     setattr(dataobj, attrkey, 'drift')
+            elif attrkey == 'integration_time':
+                int_time_array = NP.ones(self.infodict['Nblts'], dtype=NP.float) * self.infodict[attrkey]
+                setattr(dataobj, attrkey, int_time_array)
+
             elif attrkey != 'data_array':
                 setattr(dataobj, attrkey, self.infodict[attrkey])
             else:
