@@ -8607,7 +8607,7 @@ class InterferometerArray(object):
     #############################################################################
 
     def write_uvfits(self, outfile, uvfits_parms=None, overwrite=False,
-                     verbose=True):
+                     verbose=True, uvh5=False):
 
         """
         -------------------------------------------------------------------------
@@ -8683,7 +8683,7 @@ class InterferometerArray(object):
                 uvfits_parms['method'] = None
             dataobj = InterferometerData(self, ref_point=uvfits_parms['ref_point'])
             for datakey in dataobj.infodict['data_array']:
-                dataobj.write(outfile+'-{0}.uvfits'.format(datakey), datatype=datakey, fmt='UVFITS', uvfits_method=uvfits_parms['method'], overwrite=overwrite)
+                dataobj.write(outfile+'-{0}.uvfits'.format(datakey), datatype=datakey, fmt='UVFITS', uvfits_method=uvfits_parms['method'], overwrite=overwrite, uvh5=uvh5)
 
 #################################################################################
 
@@ -9293,7 +9293,7 @@ class InterferometerData(object):
     #############################################################################
 
     def write(self, outfile, datatype='noiseless', fmt='UVFITS',
-              uvfits_method=None, overwrite=False):
+              uvfits_method=None, overwrite=False, uvh5=False):
 
         """
         ------------------------------------------------------------------------
@@ -9351,7 +9351,11 @@ class InterferometerData(object):
             if (uvfits_method is None) or (uvfits_method == 'uvdata'):
                 try:
                     uvdataobj = self.createUVData(datatype=datatype)
-                    uvdataobj.write_uvfits(outfile, spoof_nonessential=True)
+                    if uvh5:
+                        outfile = outfile.split('.uvfits')[0] + '.uvh5'
+                        uvdataobj.write_uvh5(outfile)
+                    else:
+                        uvdataobj.write_uvfits(outfile, spoof_nonessential=True)
                 except Exception as xption1:
                     write_successful = False
                     if uvfits_method == 'uvdata':
